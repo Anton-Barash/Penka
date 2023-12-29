@@ -117,7 +117,19 @@ function BinanceData() {
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Penka</h1>
+        <h4>
+          <img
+            alt="Penka"
+            style={{
+              width: "27px",
+              verticalAlign: "baseline",
+              marginRight: "5px",
+              opacity: 0.5,
+            }}
+            src="penka.jpg"
+          ></img>
+          Penka
+        </h4>
         <MDBDropdown style={{ height: "min-content" }} group>
           <MDBDropdownToggle color="warning"> {lng}</MDBDropdownToggle>
           <MDBDropdownMenu>
