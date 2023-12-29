@@ -1,0 +1,9 @@
+{
+  "tradingVolume": "Penka! Historical trading volume data for the last {{weeks}} week(s)",
+  "currencyPair": "Currency Pair",
+  "minPrice": "Minimum Price",
+  "maxPrice": "Maximum Price",
+  "percentageChange": "Percentage Change",
+  "selectWeeks": "Select number of weeks:",
+  "thresholdPercentageChange": "Specify threshold value of Percentage Change (%)"
+}

@@ -1,0 +1,9 @@
+{
+  "tradingVolume": "Penka！过去{{weeks}}周的历史交易数据",
+    "currencyPair": "货币对",
+    "minPrice": "最低价格",
+    "maxPrice": "最高价格",
+    "percentageChange": "百分比变化",
+    "selectWeeks": "选择周数：",
+    "thresholdPercentageChange": "指定百分比变化的阈值 (%)"
+  }

@@ -1,8 +1,9 @@
 
 import './App.css';
 import BinanceData from './modul/BinanceData';
+import './locales/i18n';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
-const axios = require('axios');
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        
         <BinanceData></BinanceData>
 
 
