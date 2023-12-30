@@ -156,13 +156,14 @@ function BinanceData() {
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
           margin: "1rem",
           justifyContent: "space-between",
           alignItems: "flex-start",
+          flexWrap: "wrap",
+          flexDirection: "row-reverse",
         }}
       >
-        <table>
+        <table style={{ minWidth: "580px", marginRight: "auto" }}>
           <thead>
             <tr>
               <th style={{ paddingLeft: "1rem" }}>{t("currencyPair")}</th>
@@ -203,8 +204,17 @@ function BinanceData() {
             })}
           </tbody>
         </table>
-        <div style={{ display: "grid", marginLeft: "1rem" }}>
-          <label>
+        <div
+          style={{
+            order: "-1",
+            display: "flex",
+            marginLeft: "1rem",
+            flex: "1 1 255px",
+            flexWrap: "wrap",
+            justifyContent: "flex-end",
+          }}
+        >
+          <label style={{ width: "100%", maxWidth: "365px" }}>
             {t("selectWeeks")}{" "}
             <MDBInput
               contrast
@@ -214,7 +224,7 @@ function BinanceData() {
             />
           </label>
 
-          <label>
+          <label style={{ width: "100%", maxWidth: "365px" }}>
             {t("thresholdPercentageChange")}{" "}
             <MDBInput
               contrast

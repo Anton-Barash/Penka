@@ -17,8 +17,10 @@
   color: #61dafb;
 }
 
-
-
 .apexcharts-tooltip {
   color: orange;
+}
+
+.apexcharts-series[seriesName="Volume"] path {
+  stroke: none;
 }

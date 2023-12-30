@@ -47,10 +47,6 @@ function CandlestickChart(props) {
   }, [props.symbol]);
 
   const options = {
-    chart: {
-      type: "candlestick",
-      height: 350,
-    },
     title: {
       text: props.symbol,
       align: "left",
@@ -87,17 +83,19 @@ function CandlestickChart(props) {
             {
               name: "Volume",
               type: "column",
+
               data: candlestickData.map((item) => ({
                 x: item.x,
                 y: item.volume,
               })),
+      
             },
           ]}
+    
         />
       )}
     </div>
   );
 }
-
 
 export default CandlestickChart;
