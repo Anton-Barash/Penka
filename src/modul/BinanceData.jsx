@@ -9,6 +9,9 @@ import {
   MDBDropdown,
   MDBDropdownToggle,
   MDBInput,
+  MDBTable,
+  MDBTableHead,
+  MDBTableBody,
 } from "mdb-react-ui-kit";
 
 function BinanceData() {
@@ -163,16 +166,25 @@ function BinanceData() {
           flexDirection: "row-reverse",
         }}
       >
-        <table style={{ minWidth: "580px", marginRight: "auto" }}>
-          <thead>
-            <tr>
+        <table
+          className="text-white"
+          borderless
+          style={{
+            marginRight: "auto",
+            maxWidth: "fit-content",
+            padding: "0.1rem",
+          }}
+        >
+          <MDBTableHead>
+            <tr style={{ fontSize: "large" }}>
               <th style={{ paddingLeft: "1rem" }}>{t("currencyPair")}</th>
               <th style={{ paddingLeft: "1rem" }}>{t("minPrice")}</th>
               <th style={{ paddingLeft: "1rem" }}>{t("maxPrice")}</th>
               <th style={{ paddingLeft: "1rem" }}> {t("percentageChange")}</th>
             </tr>
-          </thead>
-          <tbody>
+          </MDBTableHead>
+
+          <MDBTableBody>
             {usdPairs.map((pair) => {
               const minPrice = minPrices[pair.symbol];
               const maxPrice = maxPrices[pair.symbol];
@@ -186,14 +198,14 @@ function BinanceData() {
                 percentageChange >= changeThreshold - 0
               ) {
                 return (
-                  <tr key={pair.symbol}>
+                  <tr className="text-white" key={pair.symbol}>
                     <td
                       style={{ cursor: "pointer" }}
                       onClick={() => setSymbol(pair.symbol)}
                     >
                       {pair.symbol}
                     </td>
-                    <td>{minPrice}</td>
+                    <td>{minPrice ? minPrice : 0}</td>
                     <td>{maxPrice}</td>
                     <td>{percentageChange}%</td>
                   </tr>
@@ -202,7 +214,7 @@ function BinanceData() {
                 return null;
               }
             })}
-          </tbody>
+          </MDBTableBody>
         </table>
         <div
           style={{

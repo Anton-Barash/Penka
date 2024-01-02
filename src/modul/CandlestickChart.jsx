@@ -34,6 +34,7 @@ function CandlestickChart(props) {
         }));
 
         // Установите полученные данные в состояние
+        console.log(formattedData);
         setCandlestickData(formattedData);
       })
       .catch((error) => {
@@ -60,12 +61,22 @@ function CandlestickChart(props) {
         tooltip: {
           enabled: true,
         },
+        labels: {
+          formatter: function (value) {
+            return value ? value.toFixed(4) + " $" : 0;
+          },
+        },
       },
       {
         seriesName: "Volume",
         opposite: true,
         title: {
           text: "Volume",
+        },
+        labels: {
+          formatter: function (value) {
+            return value / 1000000 + " m";
+          },
         },
       },
     ],
@@ -88,10 +99,8 @@ function CandlestickChart(props) {
                 x: item.x,
                 y: item.volume,
               })),
-      
             },
           ]}
-    
         />
       )}
     </div>
