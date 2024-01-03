@@ -1,11 +1,13 @@
+
 const path = require('path');
 
 module.exports = {
+  mode: 'development',
   entry: "./src/index.js",
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.js?$/,
         use: {
           loader: 'babel-loader',
           options: {
@@ -20,6 +22,7 @@ module.exports = {
       }
     ]
   },
+  
   output: {
     path: path.resolve(__dirname, './build/js/'),
     filename: 'bundle.js'
