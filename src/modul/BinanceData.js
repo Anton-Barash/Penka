@@ -14,6 +14,7 @@ import {
   MDBTableBody,
 } from "mdb-react-ui-kit";
 import DisqusComments from "./DisqusComments";
+import BuyMeACoffeeButton from "./BuyMeACoffeeButton";
 
 function BinanceData() {
   const { t, i18n } = useTranslation();
@@ -249,7 +250,9 @@ function BinanceData() {
         </div>
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
+      <BuyMeACoffeeButton></BuyMeACoffeeButton>
       <DisqusComments ></DisqusComments>
+      
     </div>
   );
 }
