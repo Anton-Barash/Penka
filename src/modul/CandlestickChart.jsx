@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 function CandlestickChart(props) {
-  const [candlestickData, setCandlestickData] = useState(null);
+  CandlestickChart.propTypes = {
+    symbol: PropTypes.string.isRequired,
+    // Здесь определяются другие типы свойств
+  };
 
+  const [candlestickData, setCandlestickData] = useState(null);
   const fetchCandlestickData = (symbol) => {
+    console.log(symbol);
     const baseUrl = "https://api.binance.com";
     const endPoint = "/api/v3/klines";
     const interval = "1w"; // интервал недели
@@ -15,7 +21,7 @@ function CandlestickChart(props) {
 
     axios
       .get(
-        `${baseUrl}${endPoint}?symbol=${symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
+        `${baseUrl}${endPoint}?symbol=${props.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
       )
       .then((response) => {
         // Получите данные из ответа

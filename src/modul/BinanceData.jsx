@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CandlestickChart from "./CandlestickChart";
-import { useTranslation, Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import debounce from "debounce";
 import {
   MDBDropdownMenu,
@@ -9,7 +9,6 @@ import {
   MDBDropdown,
   MDBDropdownToggle,
   MDBInput,
-  MDBTable,
   MDBTableHead,
   MDBTableBody,
 } from "mdb-react-ui-kit";
@@ -170,7 +169,6 @@ function BinanceData() {
       >
         <table
           className="text-white"
-          borderless
           style={{
             marginRight: "auto",
             maxWidth: "fit-content",
@@ -226,6 +224,7 @@ function BinanceData() {
             flex: "1 1 255px",
             flexWrap: "wrap",
             justifyContent: "flex-end",
+            alignItems: "flex-end",
           }}
         >
           <label style={{ width: "100%", maxWidth: "365px" }}>
@@ -251,8 +250,7 @@ function BinanceData() {
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
       <BuyMeACoffeeButton></BuyMeACoffeeButton>
-      <DisqusComments ></DisqusComments>
-      
+      <DisqusComments></DisqusComments>
     </div>
   );
 }

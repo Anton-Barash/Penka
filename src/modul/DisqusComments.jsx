@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 
 const DisqusComments = () => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const DisqusComments = () => {
     };
   }, []);
 
-  return <div style={{ marginTop: "15rem" }} id="disqus_thread"></div>;
+  return <div style={{ marginTop: "12rem" }} id="disqus_thread"></div>;
 };
 
 export default DisqusComments;
