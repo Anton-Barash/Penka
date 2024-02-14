@@ -3,7 +3,6 @@ import axios from "axios";
 import CandlestickChart from "./CandlestickChart";
 import { useTranslation } from "react-i18next";
 import debounce from "debounce";
-
 import {
   MDBDropdownMenu,
   MDBDropdownItem,
@@ -12,40 +11,10 @@ import {
   MDBInput,
   MDBTableHead,
   MDBTableBody,
-  MDBSpinner
 } from "mdb-react-ui-kit";
 import DisqusComments from "./DisqusComments";
 import BuyMeACoffeeButton from "./BuyMeACoffeeButton";
 import BinanceDataVolume from "./BinanceDataVolume";
-import RoundButton from "./elements/RoundButton";
-import styled from '@emotion/styled';
-
-
-
-
-
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Затемнение фона */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-   ${(props) => (props.hidden ? 'display: none;' : '')} /* Добавляем условие для скрытия модального окна */
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-`;
-
 
 function BinanceData() {
   const { t, i18n } = useTranslation();
@@ -54,6 +23,7 @@ function BinanceData() {
     i18n.changeLanguage(lng);
   };
   const [lng, setLng] = React.useState("En");
+
   const [minPrices, setMinPrices] = useState({});
   const [maxPrices, setMaxPrices] = useState({});
   const [weeks, setWeeks] = useState(4); // По умолчанию 4 недели
@@ -67,8 +37,6 @@ function BinanceData() {
   const endTime = currentTime; // текущее время
   const [symbol, setSymbol] = useState("TUSDUSDT");
 
-  const [waitSpinner, setWiatSpinner] = React.useState(false)
-
   const excludedPairs = [
     "TUSDUSDT",
     "USDCUSDT",
@@ -79,52 +47,12 @@ function BinanceData() {
     "EURUSDT",
   ];
 
-
-
-  const fetchDataPairList = async () => {
-    console.log('fetchDataPairList')
-    try {
-      setWiatSpinner(true)
-      // Получение данных за последние weks недели с использованием Axios
-      await Promise.all(usdPairs.map(async (pair) => {
-        const response = await axios.get(
-          `${baseUrl}${endPoint}?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
-        );
-
-        let lowestLow = Number.MAX_VALUE;
-        let highestHigh = 0;
-
-        for (const data of response.data) {
-          const lowPrice = parseFloat(data[3]);
-          const highPrice = parseFloat(data[2]);
-          if (lowPrice < lowestLow) {
-            lowestLow = lowPrice;
-          }
-          if (highPrice > highestHigh) {
-            highestHigh = highPrice;
-          }
-        }
-
-        setMinPrices((prev) => {
-          return { ...prev, [pair.symbol]: lowestLow };
-        });
-        setMaxPrices((prev) => {
-          return { ...prev, [pair.symbol]: highestHigh };
-        });
-      }));
-      // console.log('Все запросы завершены' + maxPrices);
-      setWiatSpinner(false)
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     // Запрос для получения списка всех торговых пар с USDT
     axios
       .get(`${baseUrl}/api/v3/exchangeInfo`)
       .then((response) => {
-
+        
         const usdtPairs = response.data.symbols.filter(
           (pair) =>
             pair.symbol.endsWith("USDT") && !excludedPairs.includes(pair.symbol)
@@ -137,6 +65,44 @@ function BinanceData() {
       });
   }, []);
 
+  const fetchDataPairList = () => {
+    // Получение данных за последние weks недели с использованием Axios
+    usdPairs.forEach((pair) => {
+      axios
+        .get(
+          `${baseUrl}${endPoint}?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
+        )
+        .then((response) => {
+        
+          let lowestLow = Number.MAX_VALUE
+          let highestHigh = 0;
+
+          for (const data of response.data) {
+            const lowPrice = parseFloat(data[3]);
+            const highPrice = parseFloat(data[2]);
+            if (lowPrice < lowestLow) {
+              lowestLow = lowPrice;
+            }
+            if (highPrice > highestHigh) {
+              highestHigh = highPrice;
+            }
+          }
+          setMinPrices((prev) => {
+            return { ...prev, [pair.symbol]: lowestLow };
+          });
+          setMaxPrices((prev) => {
+            return { ...prev, [pair.symbol]: highestHigh };
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+  };
+  useEffect(() => {
+    fetchDataPairList();
+  }, [usdPairs]);
+
   useEffect(() => {
     const debouncedFetchData = debounce(() => {
       fetchDataPairList();
@@ -145,7 +111,7 @@ function BinanceData() {
     return () => {
       debouncedFetchData.clear();
     };
-  }, [weeks, usdPairs]);
+  }, [weeks]);
 
   return (
     <div
@@ -156,16 +122,6 @@ function BinanceData() {
         maxWidth: "1000px",
       }}
     >
-      <Modal hidden={waitSpinner}>
-        <ModalContent>
-          <MDBSpinner color='success'>
-            <span className='visually-hidden'>Loading...</span>
-          </MDBSpinner>
-        </ModalContent>
-      </Modal>
-
-
-
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>
           <img
@@ -203,21 +159,6 @@ function BinanceData() {
       </div>
 
       <h2 style={{ marginTop: "5rem" }}>{t("tradingVolume", { weeks })}</h2>
-      <label >
-        {t("selectWeeks")}{" "}
-
-        <div
-          style={{ display: 'flex', alignItems: 'center' }}>
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
-          <MDBInput
-            contrast
-            type="number"
-            value={weeks}
-            onChange={(e) => setWeeks(e.target.value)}
-          />
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
-        </div>
-      </label>
       <div
         style={{
           display: "flex",
@@ -228,7 +169,6 @@ function BinanceData() {
           flexDirection: "row-reverse",
         }}
       >
-
         <table
           className="text-white"
           style={{
@@ -288,10 +228,16 @@ function BinanceData() {
             justifyContent: "flex-end",
             alignItems: "flex-end",
           }}
-
         >
-
-
+          <label style={{ width: "100%", maxWidth: "365px" }}>
+            {t("selectWeeks")}{" "}
+            <MDBInput
+              contrast
+              type="number"
+              value={weeks}
+              onChange={(e) => setWeeks(e.target.value)}
+            />
+          </label>
 
           <label style={{ width: "100%", maxWidth: "365px" }}>
             {t("thresholdPercentageChange")}{" "}
@@ -306,7 +252,7 @@ function BinanceData() {
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
       <BuyMeACoffeeButton></BuyMeACoffeeButton>
-      {/* <BinanceDataVolume usdPairs={usdPairs} t={t}></BinanceDataVolume> */}
+      <BinanceDataVolume usdPairs={usdPairs} t={t}></BinanceDataVolume>
       <DisqusComments></DisqusComments>
     </div>
   );

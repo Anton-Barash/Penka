@@ -26,7 +26,7 @@ function CandlestickChart(props) {
       .then((response) => {
         // Получите данные из ответа
         const responseData = response.data;
-        console.log(responseData);
+
         // Преобразуйте данные в формат, подходящий для графика со свечками
         const formattedData = responseData.map((item) => ({
           x: new Date(item[0]),
@@ -40,7 +40,6 @@ function CandlestickChart(props) {
         }));
 
         // Установите полученные данные в состояние
-        console.log(formattedData);
         setCandlestickData(formattedData);
       })
       .catch((error) => {
