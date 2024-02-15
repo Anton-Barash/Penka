@@ -5,5 +5,6 @@
     "maxPrice": "最高价格",
     "percentageChange": "百分比变化",
     "selectWeeks": "选择周数：",
-    "thresholdPercentageChange": "指定百分比变化的阈值 (%)"
+    "thresholdPercentageChange": "指定百分比变化的阈值 (%)",
+    "minValue":"minValue"
   }

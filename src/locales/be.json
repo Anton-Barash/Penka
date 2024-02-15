@@ -1,9 +1,10 @@
 {
   "tradingVolume": "Пенка! Гістарычныя дадзеныя аб'ёму гандлю за апошнія {{weeks}} тыдняў(і)",
   "currencyPair": "Валютная пара",
-  "minPrice": "Мінімальная цана",
-  "maxPrice": "Максімальная цана",
+  "minPrice": "Мін. цана",
+  "maxPrice": "Макс. цана",
   "percentageChange": "Працэнтная змена",
   "selectWeeks": "Выберыце колькасць тыдняў:",
-  "thresholdPercentageChange": "Укажыце парагавае значэнне працэнтнай змены (%)"
+  "thresholdPercentageChange": "Укажыце парагавае значэнне працэнтнай змены (%)",
+  "minValue":"minValue"
 }

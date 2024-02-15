@@ -10,20 +10,15 @@ import {
   MDBDropdown,
   MDBDropdownToggle,
   MDBInput,
-  MDBTableHead,
-  MDBTableBody,
   MDBSpinner
 } from "mdb-react-ui-kit";
 import DisqusComments from "./DisqusComments";
 import BuyMeACoffeeButton from "./BuyMeACoffeeButton";
-import BinanceDataVolume from "./BinanceDataVolume";
+// import BinanceDataVolume from "./BinanceDataVolume";
 import RoundButton from "./elements/RoundButton";
 import styled from '@emotion/styled';
-
-
-
-
-
+import TableMaxMinPrise from "./TableMaxMinPrise";
+import TableVolimes from "./TableVolumes";
 
 const Modal = styled.div`
   position: fixed;
@@ -36,7 +31,7 @@ const Modal = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 999;
-   ${(props) => (props.hidden ? 'display: none;' : '')} /* Добавляем условие для скрытия модального окна */
+   ${(props) => (props.wait ? '' : 'display: none;')} /* Добавляем условие для скрытия модального окна */
 `;
 
 const ModalContent = styled.div`
@@ -66,8 +61,10 @@ function BinanceData() {
   const startTime = currentTime - weeks * 7 * 24 * 60 * 60 * 1000; // время начала (4 недели назад)
   const endTime = currentTime; // текущее время
   const [symbol, setSymbol] = useState("TUSDUSDT");
+  const [volume, setVolume] = useState(['USD', '100000'])
+  const [list, setList] = useState(0)
 
-  const [waitSpinner, setWiatSpinner] = React.useState(false)
+  const [waitSpinner, setWaitSpinner] = React.useState(false)
 
   const excludedPairs = [
     "TUSDUSDT",
@@ -79,22 +76,18 @@ function BinanceData() {
     "EURUSDT",
   ];
 
-
-
   const fetchDataPairList = async () => {
-    console.log('fetchDataPairList')
+    setWaitSpinner(true);
     try {
-      setWiatSpinner(true)
-      // Получение данных за последние weks недели с использованием Axios
-      await Promise.all(usdPairs.map(async (pair) => {
+      const requests = usdPairs.map(async (pair) => {
         const response = await axios.get(
           `${baseUrl}${endPoint}?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
         );
-
         let lowestLow = Number.MAX_VALUE;
         let highestHigh = 0;
-
+        let vol = []
         for (const data of response.data) {
+
           const lowPrice = parseFloat(data[3]);
           const highPrice = parseFloat(data[2]);
           if (lowPrice < lowestLow) {
@@ -103,19 +96,41 @@ function BinanceData() {
           if (highPrice > highestHigh) {
             highestHigh = highPrice;
           }
+          vol.push(data[7])
         }
 
-        setMinPrices((prev) => {
-          return { ...prev, [pair.symbol]: lowestLow };
-        });
-        setMaxPrices((prev) => {
-          return { ...prev, [pair.symbol]: highestHigh };
-        });
-      }));
-      // console.log('Все запросы завершены' + maxPrices);
-      setWiatSpinner(false)
+        return { symbol: pair.symbol, lowestLow, highestHigh, vol };
+      });
+
+      const results = await Promise.all(requests);
+
+
+      const minPricesObj = results.reduce((obj, item) => {
+        obj[item.symbol] = item.lowestLow;
+        return obj;
+      }, {});
+
+      const maxPricesObj = results.reduce((obj, item) => {
+        obj[item.symbol] = item.highestHigh;
+        return obj;
+      }, {});
+
+      let averageVolume = results.map(item => {
+        const average = (item.vol.reduce((sum, elem) => sum + Number(elem), 0)) / item.vol.length;
+        return { [item.symbol]: average };
+      }).filter(item => !isNaN(Object.values(item)[0])).sort((a, b) => Object.values(a)[0] - Object.values(b)[0]);
+
+      // сортировка и удаление nan
+      setMinPrices(minPricesObj);
+      setMaxPrices(maxPricesObj);
+      setVolume(averageVolume)
+      console.log(averageVolume)
+
+      setWaitSpinner(false);
     } catch (error) {
-      console.error(error);
+      console.error('Ошибка при получении данных:', error);
+    } finally {
+      setWaitSpinner(false);
     }
   };
 
@@ -139,7 +154,7 @@ function BinanceData() {
 
   useEffect(() => {
     const debouncedFetchData = debounce(() => {
-      fetchDataPairList();
+      console.log(fetchDataPairList())
     }, 800);
     debouncedFetchData();
     return () => {
@@ -156,16 +171,13 @@ function BinanceData() {
         maxWidth: "1000px",
       }}
     >
-      <Modal hidden={waitSpinner}>
+      <Modal wait={waitSpinner}>
         <ModalContent>
           <MDBSpinner color='success'>
             <span className='visually-hidden'>Loading...</span>
           </MDBSpinner>
         </ModalContent>
       </Modal>
-
-
-
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>
           <img
@@ -208,14 +220,14 @@ function BinanceData() {
 
         <div
           style={{ display: 'flex', alignItems: 'center' }}>
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
           <MDBInput
             contrast
             type="number"
             value={weeks}
             onChange={(e) => setWeeks(e.target.value)}
           />
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
         </div>
       </label>
       <div
@@ -229,55 +241,9 @@ function BinanceData() {
         }}
       >
 
-        <table
-          className="text-white"
-          style={{
-            marginRight: "auto",
-            maxWidth: "fit-content",
-            padding: "0.1rem",
-          }}
-        >
-          <MDBTableHead>
-            <tr style={{ fontSize: "large" }}>
-              <th style={{ paddingLeft: "1rem" }}>{t("currencyPair")}</th>
-              <th style={{ paddingLeft: "1rem" }}>{t("minPrice")}</th>
-              <th style={{ paddingLeft: "1rem" }}>{t("maxPrice")}</th>
-              <th style={{ paddingLeft: "1rem" }}> {t("percentageChange")}</th>
-            </tr>
-          </MDBTableHead>
+        <TableMaxMinPrise usdPairs={usdPairs} minPrices={minPrices} maxPrices={maxPrices} changeThreshold={changeThreshold} setSymbol={setSymbol}>
 
-          <MDBTableBody>
-            {usdPairs.map((pair) => {
-              const minPrice = minPrices[pair.symbol];
-              const maxPrice = maxPrices[pair.symbol];
-              const percentageChange = (
-                (100 * (maxPrice - minPrice)) /
-                minPrice
-              ).toFixed(2);
-              if (
-                Number(percentageChange - 1) <= changeThreshold &&
-                percentageChange !== "-Infinity" &&
-                percentageChange >= changeThreshold - 0
-              ) {
-                return (
-                  <tr className="text-white" key={pair.symbol}>
-                    <td
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setSymbol(pair.symbol)}
-                    >
-                      {pair.symbol}
-                    </td>
-                    <td>{minPrice ? minPrice : 0}</td>
-                    <td>{maxPrice}</td>
-                    <td>{percentageChange}%</td>
-                  </tr>
-                );
-              } else {
-                return null;
-              }
-            })}
-          </MDBTableBody>
-        </table>
+        </TableMaxMinPrise>
         <div
           style={{
             order: "-1",
@@ -288,25 +254,48 @@ function BinanceData() {
             justifyContent: "flex-end",
             alignItems: "flex-end",
           }}
-
         >
 
-
-
-          <label style={{ width: "100%", maxWidth: "365px" }}>
-            {t("thresholdPercentageChange")}{" "}
-            <MDBInput
-              contrast
-              type="number"
-              value={changeThreshold}
-              onChange={(e) => setChangeThreshold(e.target.value)}
-            />
+          <label style={{ width: "100%", maxWidth: "234px" }}>
+            {t("thresholdPercentageChange")}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <RoundButton onClick={() => { setChangeThreshold((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+              <MDBInput
+                contrast
+                type="number"
+                value={changeThreshold}
+                onChange={(e) => setChangeThreshold(e.target.value)}
+              />
+              <RoundButton onClick={() => { setChangeThreshold((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+            </div>
           </label>
         </div>
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
       <BuyMeACoffeeButton></BuyMeACoffeeButton>
-      {/* <BinanceDataVolume usdPairs={usdPairs} t={t}></BinanceDataVolume> */}
+      <div style={{
+        display: "flex",
+        margin: "1rem",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        flexWrap: "wrap",
+        flexDirection: "row-reverse",
+      }}>
+        <label>
+          Номер пары:
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <RoundButton onClick={() => { setList((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+            <MDBInput
+              contrast
+              type="number"
+              value={list}
+              onChange={(e) => setList(e.target.value)}
+            />
+            <RoundButton onClick={() => { setList((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+          </div>
+        </label>
+        <TableVolimes volume={volume} setSymbol={setSymbol} list={list}></TableVolimes>
+      </div>
       <DisqusComments></DisqusComments>
     </div>
   );
