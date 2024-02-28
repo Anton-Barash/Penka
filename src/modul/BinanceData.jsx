@@ -51,6 +51,7 @@ function BinanceData() {
   const [lng, setLng] = React.useState("En");
   const [minPrices, setMinPrices] = useState({});
   const [maxPrices, setMaxPrices] = useState({});
+  const [signs, setSigns] = useState({})
   const [weeks, setWeeks] = useState(4); // По умолчанию 4 недели
   const [usdPairs, setUsdPairs] = useState([]);
   const [changeThreshold, setChangeThreshold] = useState(6);
@@ -85,6 +86,7 @@ function BinanceData() {
         );
         let lowestLow = Number.MAX_VALUE;
         let highestHigh = 0;
+        let signs = false
         let vol = []
         for (const data of response.data) {
 
@@ -92,18 +94,24 @@ function BinanceData() {
           const highPrice = parseFloat(data[2]);
           if (lowPrice < lowestLow) {
             lowestLow = lowPrice;
+            signs = false // цена опустилась
           }
           if (highPrice > highestHigh) {
             highestHigh = highPrice;
+            signs = true // цена цена поднялась
           }
           vol.push(data[7])
         }
 
-        return { symbol: pair.symbol, lowestLow, highestHigh, vol };
+        return { symbol: pair.symbol, lowestLow, highestHigh, vol, signs };
       });
 
       const results = await Promise.all(requests);
-
+      console.log('results', results)
+      const signsObj = results.reduce((obj, item) => {
+        obj[item.symbol] = item.signs;
+        return obj;
+      }, {});
 
       const minPricesObj = results.reduce((obj, item) => {
         obj[item.symbol] = item.lowestLow;
@@ -124,9 +132,10 @@ function BinanceData() {
       setMinPrices(minPricesObj);
       setMaxPrices(maxPricesObj);
       setVolume(averageVolume)
-      console.log(averageVolume)
+      setSigns(signsObj)
 
       setWaitSpinner(false);
+
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
     } finally {
@@ -241,7 +250,7 @@ function BinanceData() {
         }}
       >
 
-        <TableMaxMinPrise usdPairs={usdPairs} minPrices={minPrices} maxPrices={maxPrices} changeThreshold={changeThreshold} setSymbol={setSymbol}>
+        <TableMaxMinPrise usdPairs={usdPairs} minPrices={minPrices} maxPrices={maxPrices} changeThreshold={changeThreshold} signs={signs} setSymbol={setSymbol}>
 
         </TableMaxMinPrise>
         <div
@@ -273,6 +282,7 @@ function BinanceData() {
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
       <BuyMeACoffeeButton></BuyMeACoffeeButton>
+      <h1 style={{ margin: '1rem' }}>Lowest sales volumes in (USDT):</h1>
       <div style={{
         display: "flex",
         margin: "1rem",
@@ -284,6 +294,7 @@ function BinanceData() {
         <label>
           Номер пары:
           <div style={{ display: 'flex', alignItems: 'center' }}>
+
             <RoundButton onClick={() => { setList((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
             <MDBInput
               contrast

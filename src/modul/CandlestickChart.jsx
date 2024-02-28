@@ -65,6 +65,7 @@ function CandlestickChart(props) {
       {
         tooltip: {
           enabled: true,
+                 
         },
         labels: {
           formatter: function (value) {

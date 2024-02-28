@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 
-function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, setSymbol }) {
+function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, setSymbol, signs }) {
 
     const { t } = useTranslation();
 
@@ -36,6 +36,7 @@ function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, set
                     {usdPairs.map((pair) => {
                         const minPrice = minPrices[pair.symbol];
                         const maxPrice = maxPrices[pair.symbol];
+                        const sign = signs[pair.symbol];
                         const percentageChange = (
                             (100 * (maxPrice - minPrice)) /
                             minPrice
@@ -46,7 +47,7 @@ function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, set
                             percentageChange >= changeThreshold - 0
                         ) {
                             return (
-                                <tr className="text-white" key={pair.symbol}>
+                                <tr key={pair.symbol}>
                                     <td
                                         style={{ cursor: "pointer" }}
                                         onClick={() => setSymbol(pair.symbol)}
@@ -55,7 +56,7 @@ function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, set
                                     </td>
                                     <td>{minPrice ? minPrice : 0}</td>
                                     <td>{maxPrice}</td>
-                                    <td>{percentageChange}%</td>
+                                    <td className={sign ? 'text-success' : 'text-danger'}>{percentageChange}% </td>
                                 </tr>
                             );
                         } else {
@@ -73,6 +74,7 @@ TableMaxMinPrise.propTypes = {
     usdPairs: PropTypes.array.isRequired, // Проверка, что usdPairs является массивом и обязателен для передачи
     maxPrices: PropTypes.object.isRequired, // Проверка, что maxPrices является объектом и обязателен для передачи
     minPrices: PropTypes.object.isRequired, // Проверка, что minPrices является объектом и обязателен для передачи
+    sign: PropTypes.object.isRequired, // Проверка, что sign является объектом и обязателен для передачи
     changeThreshold: PropTypes.number.isRequired, // Проверка, что changeThreshold является числом и обязателен для передачи
 };
 
