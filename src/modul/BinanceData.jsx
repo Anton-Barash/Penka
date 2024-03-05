@@ -107,7 +107,7 @@ function BinanceData() {
       });
 
       const results = await Promise.all(requests);
-      console.log('results', results)
+      // console.log('results', results)
       const signsObj = results.reduce((obj, item) => {
         obj[item.symbol] = item.signs;
         return obj;
@@ -163,7 +163,7 @@ function BinanceData() {
 
   useEffect(() => {
     const debouncedFetchData = debounce(() => {
-      console.log(fetchDataPairList())
+      fetchDataPairList()
     }, 800);
     debouncedFetchData();
     return () => {

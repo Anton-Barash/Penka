@@ -37,10 +37,17 @@ function TableMaxMinPrise({ usdPairs, maxPrices, minPrices, changeThreshold, set
                         const minPrice = minPrices[pair.symbol];
                         const maxPrice = maxPrices[pair.symbol];
                         const sign = signs[pair.symbol];
-                        const percentageChange = (
+                        const minus = (sign) => {
+                            if (!sign) {
+                                return -1;
+                            } else { return 1 }
+                        };
+
+                        const percentageChange = minus(sign) * (
                             (100 * (maxPrice - minPrice)) /
                             minPrice
                         ).toFixed(2);
+                        // console.log(percentageChange)
                         if (
                             Number(percentageChange - 1) <= changeThreshold &&
                             percentageChange !== "-Infinity" &&
@@ -74,7 +81,7 @@ TableMaxMinPrise.propTypes = {
     usdPairs: PropTypes.array.isRequired, // Проверка, что usdPairs является массивом и обязателен для передачи
     maxPrices: PropTypes.object.isRequired, // Проверка, что maxPrices является объектом и обязателен для передачи
     minPrices: PropTypes.object.isRequired, // Проверка, что minPrices является объектом и обязателен для передачи
-    sign: PropTypes.object.isRequired, // Проверка, что sign является объектом и обязателен для передачи
+    signs: PropTypes.object.isRequired, // Проверка, что sign является объектом и обязателен для передачи
     changeThreshold: PropTypes.number.isRequired, // Проверка, что changeThreshold является числом и обязателен для передачи
 };
 

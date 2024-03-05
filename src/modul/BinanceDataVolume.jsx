@@ -33,7 +33,7 @@ const BinanceDataVolume = ({ usdPairs }) => {
     const [sortVolumes, setSortVolumes] = useState(['ds'])
 
     const fetchDataPairList = async () => {
-        console.log('fetch');
+        // console.log('fetch');
 
         try {
             const requests = usdPairs.map((pair) => {
@@ -61,18 +61,18 @@ const BinanceDataVolume = ({ usdPairs }) => {
                 });
 
                 setMinVolumes((prev) => {
-                    console.log(...maxVolumes)
+                    // console.log(...maxVolumes)
                     return { ...prev, [usdPairs[index].symbol]: minVolume };
                 });
             });
 
             // Дополнительная обработка после завершения всех запросов
-            console.log(maxVolumes[0])
+            // console.log(maxVolumes[0])
             const sortedVolumes = Object.fromEntries(
                 Object.entries(maxVolumes).sort(([, a], [, b]) => a - b)
             );
             setSortVolumes(sortedVolumes);
-            console.log(sortVolumes)
+            // console.log(sortVolumes)
 
         } catch (error) {
             console.error(error);
