@@ -1,16 +1,15 @@
-/** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled'
+import { MDBIcon } from 'mdb-react-ui-kit';
 import PropTypes from 'prop-types';
 
 const RButton = styled.button`
 box-sizing: border-box;
 padding-bottom: 4px
  font-size: x-large;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background-color: #282c34;
-  color: #fff;
+ color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,9 +23,14 @@ padding-bottom: 4px
 
 const RoundButton = ({ onClick, text }) => {
     return (
+
         <RButton onClick={onClick}>
-            {text}
+            <MDBIcon style={{ color: 'black' }} iconType='solid' icon={text}>
+            </MDBIcon>
+
         </RButton>
+
+
     );
 };
 

@@ -10,7 +10,8 @@ import {
   MDBDropdown,
   MDBDropdownToggle,
   MDBInput,
-  MDBSpinner
+  MDBSpinner,
+
 } from "mdb-react-ui-kit";
 import DisqusComments from "./DisqusComments";
 import BuyMeACoffeeButton from "./BuyMeACoffeeButton";
@@ -64,8 +65,9 @@ function BinanceData() {
   const [symbol, setSymbol] = useState("TUSDUSDT");
   const [volume, setVolume] = useState(['USD', '100000'])
   const [list, setList] = useState(0)
+  const [change, setChange] = useState(false)
 
-  const [waitSpinner, setWaitSpinner] = React.useState(false)
+  const [waitSpinner, setWaitSpinner] = React.useState(true)
 
   const excludedPairs = [
     "TUSDUSDT",
@@ -229,14 +231,15 @@ function BinanceData() {
 
         <div
           style={{ display: 'flex', alignItems: 'center' }}>
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) - 1 }) }} text="minus" ></RoundButton>
+
           <MDBInput
             contrast
             type="number"
             value={weeks}
             onChange={(e) => setWeeks(e.target.value)}
           />
-          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+          <RoundButton onClick={() => { setWeeks((e) => { return Number(e) + 1 }) }} text="plus" ></RoundButton>
         </div>
       </label>
       <div
@@ -250,7 +253,7 @@ function BinanceData() {
         }}
       >
 
-        <TableMaxMinPrise usdPairs={usdPairs} minPrices={minPrices} maxPrices={maxPrices} changeThreshold={changeThreshold} signs={signs} setSymbol={setSymbol}>
+        <TableMaxMinPrise waitSpinner={waitSpinner} change={change} usdPairs={usdPairs} minPrices={minPrices} maxPrices={maxPrices} changeThreshold={changeThreshold} setChangeThreshold={setChangeThreshold} signs={signs} setSymbol={setSymbol}>
 
         </TableMaxMinPrise>
         <div
@@ -268,14 +271,22 @@ function BinanceData() {
           <label style={{ width: "100%", maxWidth: "234px" }}>
             {t("thresholdPercentageChange")}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <RoundButton onClick={() => { setChangeThreshold((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+
+
+              <RoundButton onClick={() => {
+                setChangeThreshold((prevValue) => prevValue - 1);
+                setChange(false);
+              }} text="minus" />
               <MDBInput
                 contrast
                 type="number"
                 value={changeThreshold}
                 onChange={(e) => setChangeThreshold(e.target.value)}
               />
-              <RoundButton onClick={() => { setChangeThreshold((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+              <RoundButton onClick={() => {
+                setChangeThreshold((prevValue) => prevValue + 1);
+                setChange(false);
+              }} text="plus" />
             </div>
           </label>
         </div>
@@ -295,14 +306,14 @@ function BinanceData() {
           Номер пары:
           <div style={{ display: 'flex', alignItems: 'center' }}>
 
-            <RoundButton onClick={() => { setList((e) => { return Number(e) - 1 }) }} text="-" ></RoundButton>
+            <RoundButton onClick={() => { setList((e) => { return Number(e) - 1 }) }} text="minus" ></RoundButton>
             <MDBInput
               contrast
               type="number"
               value={list}
               onChange={(e) => setList(e.target.value)}
             />
-            <RoundButton onClick={() => { setList((e) => { return Number(e) + 1 }) }} text="+" ></RoundButton>
+            <RoundButton onClick={() => { setList((e) => { return Number(e) + 1 }) }} text="plus" ></RoundButton>
           </div>
         </label>
         <TableVolimes volume={volume} setSymbol={setSymbol} list={list}></TableVolimes>
