@@ -205,7 +205,7 @@ function BinanceData() {
             }}
             src="penka.jpg"
           ></img>
-          Penka
+          Penka Vercel
         </h4>
         <MDBDropdown style={{ height: "min-content" }} group>
           <MDBDropdownToggle color="warning"> {lng}</MDBDropdownToggle>
