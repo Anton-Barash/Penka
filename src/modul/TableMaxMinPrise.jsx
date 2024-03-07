@@ -1,5 +1,6 @@
 
 import PropTypes from 'prop-types'
+import debounce from "debounce";
 import {
     MDBTableHead,
     MDBTableBody,
@@ -8,6 +9,13 @@ import {
 import { useTranslation } from "react-i18next";
 
 function TableMaxMinPrise({ waitSpinner, usdPairs, maxPrices, minPrices, changeThreshold, setSymbol, setChangeThreshold, signs, change }) {
+    const a = changeThreshold
+
+    const search = () => {
+        setChangeThreshold(a + minus2);
+    }
+    const debouncedSearch = debounce(search, 10); // Вызов функции search будет отложен на 500 миллисекунд
+
 
     const { t } = useTranslation();
     const minus2 = change ? 1 : -1;
@@ -71,11 +79,8 @@ function TableMaxMinPrise({ waitSpinner, usdPairs, maxPrices, minPrices, changeT
 
                     {
 
-                        !waitSpinner && (
-                            tab.length ? tab :
-                                (setChangeThreshold(
-                                    (prevVal) => prevVal + minus2
-                                ))
+                        !waitSpinner & Math.abs(changeThreshold) < 1000 && (
+                            tab.length ? tab : debouncedSearch()
                         )
 
                     }
@@ -100,13 +105,3 @@ TableMaxMinPrise.propTypes = {
 };
 
 export default TableMaxMinPrise
-
-
-// setChangeThreshold((prevVal) => {
-//     if (change && !waitSpinner) {
-//         return prevVal + 1
-//     }
-//     else if (!waitSpinner) {
-//         return prevVal - 1
-//     }
-// })

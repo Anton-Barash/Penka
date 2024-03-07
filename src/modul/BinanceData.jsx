@@ -140,9 +140,10 @@ function BinanceData() {
 
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
-    } finally {
-      setWaitSpinner(false);
     }
+    // finally {
+    //   setWaitSpinner(false);
+    // }
   };
 
   useEffect(() => {
@@ -164,13 +165,16 @@ function BinanceData() {
   }, []);
 
   useEffect(() => {
-    const debouncedFetchData = debounce(() => {
-      fetchDataPairList()
-    }, 800);
-    debouncedFetchData();
-    return () => {
-      debouncedFetchData.clear();
-    };
+
+    if (usdPairs.length) {
+      const debouncedFetchData = debounce(() => {
+        fetchDataPairList()
+      }, 800);
+      debouncedFetchData();
+      return () => {
+        debouncedFetchData.clear();
+      };
+    }
   }, [weeks, usdPairs]);
 
   return (
@@ -285,7 +289,7 @@ function BinanceData() {
               />
               <RoundButton onClick={() => {
                 setChangeThreshold((prevValue) => prevValue + 1);
-                setChange(false);
+                setChange(true);
               }} text="plus" />
             </div>
           </label>
