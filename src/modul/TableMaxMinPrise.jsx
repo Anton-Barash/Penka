@@ -8,17 +8,18 @@ import {
 } from "mdb-react-ui-kit"
 import { useTranslation } from "react-i18next";
 
-function TableMaxMinPrise({ waitSpinner, usdPairs, maxPrices, minPrices, changeThreshold, setSymbol, setChangeThreshold, signs, change }) {
-    const a = changeThreshold
 
-    const search = () => {
-        setChangeThreshold(a + minus2);
-    }
-    const debouncedSearch = debounce(search, 10); // Вызов функции search будет отложен на 500 миллисекунд
+function TableMaxMinPrise({ waitSpinner, usdPairs, maxPrices, minPrices, changeThreshold, setSymbol, setChangeThreshold, signs, change }) {
+    let a = changeThreshold;
+
 
 
     const { t } = useTranslation();
     const minus2 = change ? 1 : -1;
+    const search = () => {
+        setChangeThreshold(Number(a) + Number(minus2));
+    }
+    const debouncedSearch = debounce(search, 5); // Вызов функции search будет отложен на 500 миллисекунд
     const tab = usdPairs.map((pair) => {
         const minPrice = minPrices[pair.symbol];
         const maxPrice = maxPrices[pair.symbol];

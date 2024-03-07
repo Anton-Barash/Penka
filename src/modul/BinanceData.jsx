@@ -56,6 +56,7 @@ function BinanceData() {
   const [weeks, setWeeks] = useState(4); // По умолчанию 4 недели
   const [usdPairs, setUsdPairs] = useState([]);
   const [changeThreshold, setChangeThreshold] = useState(6);
+  const [changeThreshold2, setChangeThreshold2] = useState(6);
   const baseUrl = "https://api.binance.com";
   const endPoint = "/api/v3/klines";
   const interval = "1w"; // интервал недели
@@ -177,6 +178,28 @@ function BinanceData() {
     }
   }, [weeks, usdPairs]);
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      set_HandleInputFocus(false)
+      setChangeThreshold(e.target.value)
+      console.log('Применяем изменения:', e.target.value);
+    }
+  };
+
+  const [_handleInputFocus, set_HandleInputFocus] = useState(false)
+
+  const handleInputFocus = () => {
+    setChangeThreshold2(changeThreshold)
+    set_HandleInputFocus(true)
+
+  }
+
+  const handleInputBlur = () => {
+    set_HandleInputFocus(false)
+
+  }
+
+
   return (
     <div
       style={{
@@ -284,8 +307,17 @@ function BinanceData() {
               <MDBInput
                 contrast
                 type="number"
-                value={changeThreshold}
-                onChange={(e) => setChangeThreshold(e.target.value)}
+                value={!_handleInputFocus ? changeThreshold : changeThreshold2}
+                onKeyDown={handleKeyPress}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                onChange={(e) => {
+                  if (!_handleInputFocus) {
+                    setChangeThreshold(e.target.value); // Установите порог изменения
+                  } else {
+                    setChangeThreshold2(e.target.value)
+                  }
+                }}
               />
               <RoundButton onClick={() => {
                 setChangeThreshold((prevValue) => prevValue + 1);
