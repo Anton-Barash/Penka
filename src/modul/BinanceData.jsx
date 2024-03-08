@@ -66,7 +66,7 @@ function BinanceData() {
   const startTime = currentTime - weeks * 7 * 24 * 60 * 60 * 1000; // время начала (4 недели назад)
   const endTime = currentTime; // текущее время
   const [symbol, setSymbol] = useState("TUSDUSDT");
-  const [volume, setVolume] = useState(['USD', '100000'])
+  const [volume, setVolume] = useState([])
   const [list, setList] = useState(1)
   const [change, setChange] = useState(false)
 
