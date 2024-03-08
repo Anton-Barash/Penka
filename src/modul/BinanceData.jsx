@@ -20,6 +20,7 @@ import RoundButton from "./elements/RoundButton";
 import styled from '@emotion/styled';
 import TableMaxMinPrise from "./TableMaxMinPrise";
 import TableVolimes from "./TableVolumes";
+import TablMarkPrice from "./TablMarkPrice";
 
 const Modal = styled.div`
   position: fixed;
@@ -52,7 +53,7 @@ function BinanceData() {
   const [lng, setLng] = React.useState("En");
   const [minPrices, setMinPrices] = useState({});
   const [maxPrices, setMaxPrices] = useState({});
-  const [markPrice, setMarkPrice] = useState({})
+  const [markPrice, setMarkPrice] = useState([])
   const [signs, setSigns] = useState({})
   const [weeks, setWeeks] = useState(4); // По умолчанию 4 недели
   const [usdPairs, setUsdPairs] = useState([]);
@@ -66,7 +67,7 @@ function BinanceData() {
   const endTime = currentTime; // текущее время
   const [symbol, setSymbol] = useState("TUSDUSDT");
   const [volume, setVolume] = useState(['USD', '100000'])
-  const [list, setList] = useState(0)
+  const [list, setList] = useState(1)
   const [change, setChange] = useState(false)
 
   const [waitSpinner, setWaitSpinner] = React.useState(true)
@@ -95,6 +96,9 @@ function BinanceData() {
         for (const data of response.data) {
 
           const lowPrice = parseFloat(data[3]);
+          // console.log(`${baseUrl}${endPoint}?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`)
+          // console.log(pair.symbol, ': ', lowPrice)
+
           const highPrice = parseFloat(data[2]);
           if (lowPrice < lowestLow) {
             lowestLow = lowPrice;
@@ -111,7 +115,6 @@ function BinanceData() {
       });
 
       const results = await Promise.all(requests);
-      // console.log('results', results)
       const signsObj = results.reduce((obj, item) => {
         obj[item.symbol] = item.signs;
         return obj;
@@ -159,21 +162,16 @@ function BinanceData() {
             `https://api.binance.com/api/v1/ticker/price?symbol=${pair.symbol}`
           );
           const markPrice = response.data.price
-          return { symbol: pair.symbol, markPrice }
+          return { symbol: pair.symbol, markPrice: Number(markPrice), minPrices: minPrices[pair.symbol], percent: ((Number(markPrice) - minPrices[pair.symbol]) / minPrices[pair.symbol]) * 100 }
         }
       )
 
       const result = await Promise.all(respPrise)
       console.log('result')
 
-      const markPr = result.reduce(
-        (obj, item) => {
-          obj[item.symbol] = Number(item.markPrice)
-          return obj
-        }, {}
-      )
-      setMarkPrice(markPr)
-      console.log(markPrice)
+
+      setMarkPrice(result)
+      // console.log(minPrices)
       setWaitSpinner(false);
     } catch (error) {
       console.log(error)
@@ -376,6 +374,34 @@ function BinanceData() {
       </div>
       <CandlestickChart symbol={symbol}></CandlestickChart>
       <BuyMeACoffeeButton></BuyMeACoffeeButton>
+      <h1 style={{ margin: '1rem' }}>Lowest sales % in (USDT):</h1>
+
+
+      <div style={{
+        display: "flex",
+        margin: "1rem",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        flexWrap: "wrap",
+        flexDirection: "row-reverse",
+      }}>
+        <label>
+          Номер пары:
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+
+            <RoundButton onClick={() => { setList((e) => { return Number(e) - 1 }) }} text="minus" ></RoundButton>
+            <MDBInput
+              contrast
+              type="number"
+              value={list}
+              onChange={(e) => setList(e.target.value)}
+            />
+            <RoundButton onClick={() => { setList((e) => { return Number(e) + 1 }) }} text="plus" ></RoundButton>
+          </div>
+        </label>
+        <TablMarkPrice markPrice={markPrice} setSymbol={setSymbol} list={list}></TablMarkPrice>
+      </div>
+
       <h1 style={{ margin: '1rem' }}>Lowest sales volumes in (USDT):</h1>
       <div style={{
         display: "flex",
