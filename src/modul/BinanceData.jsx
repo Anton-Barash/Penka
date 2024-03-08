@@ -52,6 +52,7 @@ function BinanceData() {
   const [lng, setLng] = React.useState("En");
   const [minPrices, setMinPrices] = useState({});
   const [maxPrices, setMaxPrices] = useState({});
+  const [markPrice, setMarkPrice] = useState({})
   const [signs, setSigns] = useState({})
   const [weeks, setWeeks] = useState(4); // По умолчанию 4 недели
   const [usdPairs, setUsdPairs] = useState([]);
@@ -137,7 +138,7 @@ function BinanceData() {
       setVolume(averageVolume)
       setSigns(signsObj)
 
-      setWaitSpinner(false);
+
 
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
@@ -146,6 +147,40 @@ function BinanceData() {
     //   setWaitSpinner(false);
     // }
   };
+
+
+  const fetchPrise = async () => {
+
+    try {
+
+      const respPrise = usdPairs.map(
+        async (pair) => {
+          const response = await axios.get(
+            `https://api.binance.com/api/v1/ticker/price?symbol=${pair.symbol}`
+          );
+          const markPrice = response.data.price
+          return { symbol: pair.symbol, markPrice }
+        }
+      )
+
+      const result = await Promise.all(respPrise)
+      console.log('result')
+
+      const markPr = result.reduce(
+        (obj, item) => {
+          obj[item.symbol] = Number(item.markPrice)
+          return obj
+        }, {}
+      )
+      setMarkPrice(markPr)
+      console.log(markPrice)
+      setWaitSpinner(false);
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
 
   useEffect(() => {
     // Запрос для получения списка всех торговых пар с USDT
@@ -166,7 +201,6 @@ function BinanceData() {
   }, []);
 
   useEffect(() => {
-
     if (usdPairs.length) {
       const debouncedFetchData = debounce(() => {
         fetchDataPairList()
@@ -177,6 +211,19 @@ function BinanceData() {
       };
     }
   }, [weeks, usdPairs]);
+
+  useEffect(() => {
+    if (usdPairs.length && minPrices) {
+      const debouncedFetchData = debounce(() => {
+        fetchPrise()
+      }, 800);
+      debouncedFetchData();
+      return () => {
+        debouncedFetchData.clear();
+      };
+    }
+  }, [minPrices]);
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
