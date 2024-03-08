@@ -32,10 +32,10 @@ function TablMarkPrice({ markPrice, setSymbol, list }) {
         >
             <MDBTableHead>
                 <tr style={{ fontSize: "large" }}>
-                    <th >{t("currencyPair")}</th>
-                    <th >{t('minPrice')}</th>
-                    <th >{'markPrice:'}</th>
-                    <th >{"%"}</th>
+                    <th style={{ paddingLeft: "1rem" }}>{t("currencyPair")}</th>
+                    <th style={{ paddingLeft: "1rem" }}>{t('minPrice')}</th>
+                    <th style={{ paddingLeft: "1rem" }}>{'Price:'}</th>
+                    <th style={{ paddingLeft: "1rem" }}>{"%"}</th>
                 </tr>
             </MDBTableHead>
             <MDBTableBody>

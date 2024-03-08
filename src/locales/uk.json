@@ -1,8 +1,8 @@
 {
   "tradingVolume": "Penka! Історичні дані обсягу торгів за останні {{weeks}} тижні(в)",
   "currencyPair": "Валютна пара",
-  "minPrice": "Мінімальна ціна",
-  "maxPrice": "Максимальна ціна",
+  "minPrice": "Мін ціна",
+  "maxPrice": "Макс ціна",
   "percentageChange": "Відсоткова зміна",
   "selectWeeks": "Виберіть кількість тижнів:",
   "thresholdPercentageChange": "Вкажіть порогове значення Відсоткової зміни (%)",
