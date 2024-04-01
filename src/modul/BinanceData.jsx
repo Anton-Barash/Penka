@@ -60,15 +60,18 @@ function BinanceData() {
   const [usdPairs, setUsdPairs] = useState([]);
   const [changeThreshold, setChangeThreshold] = useState(6);
   const [changeThreshold2, setChangeThreshold2] = useState(6);
-  const baseUrl_s = "https://api.binance.com";
-  const endPoint_s = "/api/v3";
-  const baseUrl_f = "https://fapi.binance.com";
-  const endPoint_f = "/fapi/v1";
+  // const baseUrl_s = "https://api.binance.com";
+  // const endPoint_s = "";
+  // const baseUrl_f = "https://fapi.binance.com";
+  // const endPoint_f = "/fapi/v1";
+
+  const url_s = "https://api.binance.com/api/v3"
+  const url_f = "https://fapi.binance.com/fapi/v1"
   const interval = "1w"; // интервал недели
   const currentTime = new Date().getTime(); // текущее время в миллисекундах
   const startTime = currentTime - weeks * 7 * 24 * 60 * 60 * 1000; // время начала (4 недели назад)
   const endTime = currentTime; // текущее время
-  const [symbol, setSymbol] = useState("TUSDUSDT");
+  const [symbol, setSymbol] = useState("BTCUSDT");
   const [volume, setVolume] = useState([])
   const [list, setList] = useState(1)
   const [change, setChange] = useState(false)
@@ -76,8 +79,6 @@ function BinanceData() {
   const [waitSpinner, setWaitSpinner] = React.useState(true)
   const [isChecked, setIsChecked] = useState(true);
 
-  let baseUrl = isChecked ? baseUrl_f : baseUrl_s
-  let endPoint = isChecked ? endPoint_f : endPoint_s
 
   const excludedPairs = [
     "TUSDUSDT",
@@ -89,12 +90,30 @@ function BinanceData() {
     "EURUSDT",
   ];
 
+  useEffect(() => {
+    // Запрос для получения списка всех торговых пар с USDT
+    axios
+      .get(`${isChecked ? url_f : url_s}/exchangeInfo`)
+      .then((response) => {
+
+        const usdtPairs = response.data.symbols.filter(
+          (pair) =>
+            pair.symbol.endsWith("USDT") && !excludedPairs.includes(pair.symbol)
+        );
+
+        setUsdPairs(usdtPairs);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [isChecked]);
+
   const fetchDataPairList = async () => {
     setWaitSpinner(true);
     try {
       const requests = usdPairs.map(async (pair) => {
         const response = await axios.get(
-          `${baseUrl}${endPoint}/klines?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
+          `${isChecked ? url_f : url_s}/klines?symbol=${pair.symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`
         );
         let lowestLow = Number.MAX_VALUE;
         let highestHigh = 0;
@@ -166,7 +185,7 @@ function BinanceData() {
       const respPrise = usdPairs.map(
         async (pair) => {
           const response = await axios.get(
-            `${baseUrl}${endPoint}/ticker/price?symbol=${pair.symbol}`
+            `${isChecked ? url_f : url_s}/ticker/price?symbol=${pair.symbol}`
           );
           const markPrice = response.data.price
           return { symbol: pair.symbol, markPrice: Number(markPrice), minPrices: minPrices[pair.symbol], percent: ((Number(markPrice) - minPrices[pair.symbol]) / minPrices[pair.symbol]) * 100 }
@@ -187,23 +206,7 @@ function BinanceData() {
   }
 
 
-  useEffect(() => {
-    // Запрос для получения списка всех торговых пар с USDT
-    axios
-      .get(`${baseUrl}${endPoint}/exchangeInfo`)
-      .then((response) => {
 
-        const usdtPairs = response.data.symbols.filter(
-          (pair) =>
-            pair.symbol.endsWith("USDT") && !excludedPairs.includes(pair.symbol)
-        );
-
-        setUsdPairs(usdtPairs);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
 
   useEffect(() => {
     if (usdPairs.length) {
